@@ -3,13 +3,13 @@ var HttpHeader = Java.type("org.parosproxy.paros.network.HttpHeader");
 var URI = Java.type("org.apache.commons.httpclient.URI");
 
 function authenticate(helper, paramsValues, credentials) {
-	print("Authenticating via JavaScript script as user…");
+	print("Authenticating via JavaScript script as client secret…");
  	var authHelper = new OAuthAuthenticator(helper, paramsValues, credentials);
 	return authHelper.login();
 }
 
 function getRequiredParamsNames(){
-	return ["adfs_endpoint","client_id","resource"];
+	return ["adfs_endpoint","client_id","client_secret","resource"];
 }
 
 function getOptionalParamsNames(){
@@ -24,8 +24,7 @@ function OAuthAuthenticator(helper, paramsValues, credentials) {
 	this.helper = helper;
 	this.adfs_endpoint = paramsValues.get('adfs_endpoint');
 	this.client_id = paramsValues.get('client_id');
-	this.username = credentials.getParam("username");
-	this.password = credentials.getParam("password");
+	this.client_secret = paramsValues.get('client_secret');
 	this.resource = paramsValues.get('resource');
 	return this;
 }
@@ -34,10 +33,9 @@ OAuthAuthenticator.prototype = {
 	login: function () {
 		print("Starting with authenticat..");
  		var loginToken,
-		requestBody = 'grant_type=' + encodeURIComponent('password') +
+		requestBody = 'grant_type=' + encodeURIComponent('client_credentials') +
                 '&client_id=' + encodeURIComponent(this.client_id) +
-                '&username=' + encodeURIComponent(this.username) +
-			 '&password=' + encodeURIComponent(this.password) +
+                '&client_secret=' + encodeURIComponent(this.client_secret) +
 			 '&resource=' + encodeURIComponent(this.resource),
  		response = this.doRequest("https://" + this.adfs_endpoint + "/adfs/oauth2/token", HttpRequestHeader.POST, requestBody);
 
